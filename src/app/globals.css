@@ -1,17 +1,30 @@
+/* globals.css */
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --header-h: 72px;
+  --hero-pt: 3.5rem;
+  --hero-pb: 1.5rem;
+  --hero-pt-md: 5rem;
+  --hero-pb-md: 2.5rem;
+  --hero-gap: 1.25rem;
+  --hero-bg-left-mobile: 3%;
+  --hero-bg-left-md: -6%;
+  --hero-bg-left-lg: -1%;
+  --hero-bg-top-mobile: 60%;
+  --hero-bg-translate-mobile: -50%;
+  --hero-bg-top-md: 60%;
+  --hero-bg-translate-md: -44%;
+  --hero-bg-top-lg: 49%;
+  --hero-bg-translate-lg: -40%;
+  --title-anim-duration: 800ms;
+  --title-anim-delay-top: 160ms;
+  --title-anim-delay-bottom: 330ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Dark mode vars */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +32,879 @@
   }
 }
 
+html,
+body,
+#__next {
+  overflow-x: hidden;
+}
+
+/* ------------- */
+/* Custom Theme  */
+/* ------------- */
+.stack-section {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+
+main.page-scroll {
+  transition: background-color 1s ease;
+  background-color: white;
+}
+
+/* ------------------ */
+/* Header data-theme */
+/* ---------------- */
+/* Header base style  */
+header {
+  position: relative;
+  transition:
+    background-color 300ms ease,
+    color 300ms ease,
+    background-image 300ms ease,
+    opacity 300ms ease;
+  will-change: background-color, color, background-image, opacity;
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 300ms ease, background-image 300ms ease;
+  pointer-events: none;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  transition: background-color 420ms cubic-bezier(.2, .9, .2, 1), color 320ms ease, box-shadow 320ms ease;
+}
+
+/* Hero theme         */
+header[data-theme="hero"] {
+  background-color: #ffffff;
+  color: #000000;
+  --header-gradient: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.04) 0,
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 20px);
+}
+
+header[data-theme="hero"]::before {
+  background-image: var(--header-gradient);
+  opacity: 1;
+}
+
+/* Expertise theme    */
+header[data-theme="expertise"] {
+  background-color: #ffffff;
+  color: #000000;
+  --header-gradient: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.04) 0,
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 20px);
+}
+
+header[data-theme="expertise"]::before {
+  background-image: var(--header-gradient);
+  opacity: 1;
+}
+
+/* Work theme */
+header[data-theme="work"] {
+  background-color: #0a0908;
+  color: #eeeee8;
+  background-image: none;
+}
+
+header[data-theme="work"]::before {
+  opacity: 0;
+  background-image: none;
+}
+
+/* Experience theme */
+header[data-theme="experience"] {
+  background-color: #0a0908;
+  color: #eeeee8;
+  background-image: none;
+}
+
+header[data-theme="experience"]::before {
+  opacity: 0;
+  background-image: none;
+}
+
+/* Base styles */
 body {
-  background: var(--background);
+  padding-top: var(--header-h);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ------------ */
+/* Hero Styles */
+/* ---------- */
+.hero::before,
+.expertise-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.04) 0,
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 20px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+/* Hero background outline word and tweaks */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-h));
+  padding-top: var(--hero-pt);
+  padding-bottom: var(--hero-pb);
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-top: var(--hero-pt-md);
+    padding-bottom: var(--hero-pb-md);
+  }
+
+  :root {
+    --hero-gap: 1.5rem;
+    --title-line-top-offset: -18px;
+    --title-line-bottom-offset: -18px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --hero-gap: 2rem;
+    --title-line-top-offset: -22px;
+    --title-line-bottom-offset: -22px;
+  }
+}
+
+.hero>.hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hero-gap);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.hero-bg-text {
+  position: absolute;
+  left: var(--hero-bg-left-mobile);
+  top: var(--hero-bg-top-mobile);
+  transform: translateY(var(--hero-bg-translate-mobile));
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.3);
+  font-weight: 400;
+  line-height: 0.9;
+  font-size: clamp(8rem, 15vw, 20rem);
+  letter-spacing: normal;
+}
+
+/* responsive sizing for the background word */
+@media (min-width: 768px) {
+  .hero-bg-text {
+    left: var(--hero-bg-left-md);
+    top: var(--hero-bg-top-md);
+    transform: translateY(var(--hero-bg-translate-md));
+    font-size: 14rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-bg-text {
+    left: var(--hero-bg-left-lg);
+    top: var(--hero-bg-top-lg);
+    transform: translateY(var(--hero-bg-translate-lg));
+    font-size: 20rem;
+  }
+}
+
+/* hero content sits above the bg word */
+.hero>.hero-inner,
+.hero .hero-title,
+.hero .hero-description {
+  position: relative;
+  z-index: 10;
+}
+
+/* hero-title Styling*/
+.hero-title {
+  display: inline-block;
+  padding: 0.5rem 0;
+  font-weight: 400;
+  font-size: 3.5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 5.5rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-title {
+    font-size: 7rem;
+  }
+}
+
+/* Title wrapper lines (top/bottom) - adjust values to taste and animate later */
+.hero-title-wrapper {
+  display: inline-block;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.hero-title-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #000;
+  -webkit-mask-image: linear-gradient(to right,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 1) 30%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0));
+  mask-image: linear-gradient(to right,
+      rgba(0, 0, 0, 0),
+      rgba(0, 0, 0, 1) 30%,
+      rgba(0, 0, 0, 1) 60%,
+      rgba(0, 0, 0, 0));
+  pointer-events: none;
+  transform: translateZ(0);
+  transition: transform 320ms ease, opacity 240ms ease;
+  will-change: transform, opacity;
+  z-index: 0;
+}
+
+/* slide-in keyframes */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* default: animate on load */
+.hero-title-line--top {
+  left: -6%;
+  right: 20%;
+  top: var(--title-line-offset);
+  transform-origin: left center;
+  animation: slideInFromLeft var(--title-anim-duration) cubic-bezier(.22, .9, .35, 1) both var(--title-anim-delay-top);
+}
+
+.hero-title-line--bottom {
+  left: 20%;
+  right: -6%;
+  bottom: var(--title-line-bottom-offset);
+  transform-origin: right center;
+  animation: slideInFromRight var(--title-anim-duration) cubic-bezier(.22, .9, .35, 1) both var(--title-anim-delay-bottom);
+}
+
+.hero-title-wrapper.is-animate .hero-title-line--top {
+  animation-play-state: running;
+}
+
+.hero-title-wrapper.is-animate .hero-title-line--bottom {
+  animation-play-state: running;
+}
+
+/* description line spacing */
+.hero-description>div {
+  line-height: 1.05;
+}
+
+.hero-description {
+  margin-top: 5rem;
+  margin-bottom: 0;
+  max-width: 640px;
+  line-height: 1.12;
+  padding: 0 .5rem;
+}
+
+.hero-arrow {
+  margin-top: 1rem;
+  margin-bottom: calc(var(--hero-pb) / 2);
+  text-align: center;
+}
+
+/* ------------------------- */
+/* Expertise Section Styles */
+/* ------------------------*/
+.expertise-section {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-h));
+  padding-top: var(--hero-pt);
+  padding-bottom: var(--hero-pb);
+  box-sizing: border-box;
+}
+
+/* huge outlined background word, sits behind cards */
+.expertise-bg-outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1.2px rgba(0, 0, 0, 0.5);
+  font-weight: 400;
+  line-height: 0.9;
+  font-size: clamp(5rem, 24vw, 16rem);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transform: translateY(-17%);
+}
+
+/* ------------------ */
+/* ripped paper edge */
+/* ---------------- */
+.ripped-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  z-index: 20;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.ripped-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Adjust height on smaller screens */
+@media (max-width: 640px) {
+  .ripped-wrap {
+    height: 70px;
+  }
+}
+
+/* ------------- */
+/* Work Section  */
+/* ------------- */
+#work {
+  position: relative;
+  overflow: hidden;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: #0a0908;
+  opacity: 0;
+  filter: brightness(50%);
+  transition: opacity 1s ease-out, filter 1.5s ease-out;
+}
+
+#work.visible {
+  opacity: 1;
+  filter: brightness(100%);
+}
+
+/* base outline word */
+.work-bg-word {
+  position: absolute;
+  font-family: "Bebas Neue", "Arial Black", sans-serif;
+  pointer-events: none;
+  user-select: none;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.7);
+  font-weight: 400;
+  line-height: 0.9;
+  font-size: clamp(8rem, 15vw, 20rem);
+  letter-spacing: normal;
+  white-space: nowrap;
+  display: block;
+  transform-origin: left center;
+}
+
+/* wrapper positions both layers correctly */
+.work-bg-word-wrap {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* front layer sits above */
+.work-bg-front {
+  position: relative;
+  z-index: 4;
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.15);
+}
+
+.work-bg-back-top {
+  position: absolute;
+  left: 0;
+  top: -19%;
+  z-index: 2;
+  transform: translateY(6%) scale(1, 1);
+  clip-path: inset(0 0 85% 0);
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.10);
+}
+
+.work-bg-back-bottom {
+  position: absolute;
+  left: 0;
+  top: 10%;
+  z-index: 2;
+  transform: translateY(6%) scale(0.995);
+  clip-path: inset(70% 0 0 0);
+  -webkit-text-stroke-color: rgba(255, 255, 255, 0.10);
+}
+
+/* small responsive tweaks */
+@media (max-width: 768px) {
+  .work-bg-word {
+    font-size: clamp(4rem, 26vw, 10rem);
+  }
+
+  .work-bg-back {
+    clip-path: inset(0 0 56% 0);
+    transform: translateY(4%);
+  }
+}
+
+/* ensure content sits above the background words */
+#work>.container {
+  position: relative;
+  z-index: 10;
+}
+
+/* work image helpers */
+.work-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  /* rounded-md */
+  transition: transform 0.6s ease;
+  transform: scale(1);
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.work-image-inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.work-image img {
+  transition: transform 0.8s ease, filter 0.6s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Hover effects */
+.work-image:hover {
+  transform: scale(0.94);
+  /* outer container shrinks */
+}
+
+.work-image:hover .work-image-inner {
+  transform: scale(0.97);
+  /* inner container shrinks slightly */
+}
+
+.work-image:hover img {
+  transform: scale(1.22);
+  /* image zooms out */
+  filter: grayscale(0%) brightness(95%);
+}
+
+/* card content sits above background words */
+section#work>.container>.grid,
+section#work .work-card,
+section#work .bg-title-work {
+  position: relative;
+  z-index: 10;
+}
+
+/* responsive tweaks */
+@media (max-width: 768px) {
+  .work-bg-word {
+    font-size: clamp(4rem, 30vw, 10rem);
+  }
+
+  .bg-title-work {
+    font-size: 2.25rem;
+  }
+}
+
+/* ------------------- */
+/* Experience section */
+/* ----------------- */
+.experience-bg-word {
+  display: block;
+  font-family: "Bebas Neue", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-weight: 400;
+  font-size: clamp(6rem, 14vw, 14rem);
+  line-height: 0.85;
+  white-space: nowrap;
+}
+
+.experience-bg-word-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Positioning like reference */
+.experience-bg-left {
+  position: absolute;
+  top: -2vw;
+  left: 0;
+}
+
+.experience-bg-right {
+  position: absolute;
+  bottom: -2vw;
+  right: 0;
+}
+
+.experience-bg-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255, 255, 255, 0.10);
+}
+
+.experience-bg-fill {
+  color: #ffffff;
+}
+
+/* Experience BG-word Styling */
+.experience-bg-left .experience-bg-fill {
+  transform: translateY(6%) scale(1, 1);
+  clip-path: inset(0 0 45% 0);
+}
+
+.experience-bg-left .experience-bg-outline {
+  position: absolute;
+  top: 2%;
+  transform: translateY(6%) scale(1, 1);
+  clip-path: inset(45% 0 0 0);
+}
+
+.experience-bg-right .experience-bg-fill {
+  transform: translateY(6%) scale(1, 1);
+  clip-path: inset(45% 0 0 0);
+}
+
+.experience-bg-right .experience-bg-outline {
+  position: absolute;
+  bottom: 2%;
+  transform: translateY(6%) scale(1, 1);
+  clip-path: inset(0 0 60% 0);
+}
+
+/* Experience Image */
+.experience-preview {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 4;
+  transform-origin: center;
+}
+
+.experience-section>.container {
+  position: relative;
+  z-index: 10;
+}
+
+.experience-card {
+  transition: transform 0.3s ease;
+}
+
+.experience-card:hover {
+  transform: translateX(4px);
+}
+
+/* label that sits centered inside the main preview box and follows its transforms */
+.preview-back-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  z-index: 20;
+  white-space: nowrap;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-family: "Bebas Neue", "Arial Black", sans-serif;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.35);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  font-size: clamp(2.8rem, 15vw + 9rem, 10rem);
+}
+
+/* ensure the text scales visually inside rotated container */
+.preview-back-label span,
+.preview-back-label::before,
+.preview-back-label::after {
+  display: block;
+}
+
+/* ---------------- */
+/* Contact Section */
+/* -------------- */
+/* Contact section background word and decorations */
+.contact-bg-wrap {
+  position: absolute;
+  inset: 0;
+  height: 100vh;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* big vertical word container */
+.contact-bg-left {
+  position: absolute;
+  left: clamp(-14rem, -8rem, -2rem);
+  bottom: clamp(12%, 14vh, 20%);
+  transform: rotate(90deg);
+  font-family: "Bebas Neue", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  z-index: 0;
+}
+
+/* word spans (fill + outline stacked) */
+.contact-bg-word {
+  display: block;
+  font-weight: 400;
+  font-size: clamp(6rem, 14vw, 14rem);
+  line-height: 0.85;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* solid fill (behind) */
+.contact-bg-fill {
+  color: rgba(255, 255, 255);
+}
+
+/* outline on top */
+.contact-bg-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.12);
+}
+
+/* social link style */
+.social-link {
+  color: #fff;
+  opacity: 0.95;
+  letter-spacing: 0.02em;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.social-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -1rem;
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 1px;
+}
+
+/* small responsive tweaks */
+@media (min-width: 1280px) {
+  .contact-bg-left .contact-bg-word {
+    font-size: 12rem;
+  }
+}
+
+/* annotation svg (hand-drawn circle + arrow) */
+.annotation-svg {
+  width: 9rem;
+  height: auto;
+  pointer-events: none;
+  display: block;
+  transform: translateZ(0);
+}
+
+.scribble {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.95;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
+}
+
+.hand-arrow {
+  opacity: 0.95;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* responsive tweak */
+@media (min-width: 768px) {
+  .annotation-svg {
+    width: 11rem;
+  }
+}
+
+/* annotation positioning variables — edit these only to tweak placement */
+.annotation-wrap {
+  --annot-arrow-left: -6rem;
+  --annot-arrow-top: 1.5rem;
+  --annot-circle-x: 0.35rem;
+  --annot-circle-y: -0.6rem;
+  position: absolute;
+  pointer-events: none;
+}
+
+/* text / "me" anchor */
+.annot-text {
+  position: relative;
+  display: inline-block;
+}
+
+.annot-me {
+  position: relative;
+  display: inline-block;
+}
+
+/* orange circle sits over the "me" word */
+.annot-circle {
+  position: absolute;
+  width: 6.4rem;
+  height: auto;
+  left: var(--annot-circle-x);
+  top: var(--annot-circle-y);
+  pointer-events: none;
+  transform-origin: center;
+  z-index: 5;
+}
+
+/* arrow: absolutely positioned within annotation wrapper — tune with CSS vars */
+.annot-arrow {
+  position: absolute;
+  width: 18rem;
+  height: auto;
+  left: var(--annot-arrow-left);
+  top: var(--annot-arrow-top);
+  pointer-events: none;
+  z-index: 4;
+  transform: rotate(0deg);
+  /* adjust rotate if you need to change angle */
+}
+
+/* small styling tweaks */
+.annot-circle path {
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
+}
+
+.annot-arrow path {
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.1));
+}
+
+/* responsive tuning */
+@media (min-width: 768px) {
+  .annotation-wrap {
+    --annot-arrow-left: -9rem;
+    --annot-arrow-top: 0.5rem;
+    --annot-circle-x: 0.6rem;
+    --annot-circle-y: -0.6rem;
+  }
+
+  .annot-circle {
+    width: 8rem;
+  }
+
+  .annot-arrow {
+    width: 22rem;
+  }
+}
+
+/* -------------------------------- */
+/* Animation for Random Rectangles */
+/* ------------------------------ */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r));
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(var(--r));
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ------------------ */
+/* Custom font class */
+/* ---------------- */
+.font-splash {
+  font-family: var(--font-splash), system-ui, sans-serif;
+}
+
+.font-alkatra {
+  font-family: var(--font-alkatra), system-ui, sans-serif;
+}
+
+.font-architects-daughter {
+  font-family: var(--font-architects-daughter), system-ui, sans-serif;
+}
+
+.font-bebas-neue {
+  font-family: var(--font-bebas-neue), system-ui, sans-serif;
 }
