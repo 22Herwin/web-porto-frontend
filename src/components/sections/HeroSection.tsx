@@ -1,109 +1,122 @@
 'use client';
-import React from 'react';
-import RandomRoles from '../ui/decorations/RandomRoles';
-import { useRandomRectangles } from '../../app/hooks/useRandomRectangles';
+
+import React, { useRef } from 'react';
+import { useHeroMotion } from '../../app/hooks/useHeroMotion';
 
 interface HeroSectionProps {
   className?: string;
 }
 
+const NAME = 'HERWIN'.split('');
+const MARQUEE_ITEMS = ['Web Dev', 'Backend', 'Unity Dev', 'Illustrator'];
+
 const HeroSection = ({ className = '' }: HeroSectionProps) => {
-  const text =
-    "Heyy I'm Herwin, I'm a Passionate “Artist” and Programmer even though sometimes I'm busy with other stuff :p";
-
-  const chunkWords = (s: string, size = 4) => {
-    const words = s.split(/\s+/);
-    const lines: string[] = [];
-    for (let i = 0; i < words.length; i += size) {
-      lines.push(words.slice(i, i + size).join(' '));
-    }
-    return lines;
-  };
-
-  React.useEffect(() => {
-    const wrapper = document.querySelector('.hero-title-wrapper');
-    if (!wrapper) return;
-    // ensure class added after paint so animation plays
-    requestAnimationFrame(() => {
-      wrapper.classList.add('is-animate');
-    });
-    // optional: remove class on unmount so it can be re-triggered later
-    return () => wrapper.classList.remove('is-animate');
-  }, []);
-
-  const randomRects = useRandomRectangles(20);
-  const lines = chunkWords(text, 7); // change use n words per line
+  const rootRef = useRef<HTMLElement | null>(null);
+  useHeroMotion(rootRef);
 
   return (
     <section
-      id="hero"
-      className={`hero bg-white text-black overflow-hidden relative select-none ${className}`}
+      id="home"
+      ref={rootRef}
+      className={`hx tx tx-paper select-none ${className}`}
       data-theme="hero"
     >
-      {/* random decorative rectangles */}
-      {randomRects.map((r) => (
-        <div
-          key={r.id}
-          aria-hidden
-          className={`absolute animate-float ${r.isFilled ? 'bg-black' : 'border-black'}`}
-          style={
-            {
-              left: `${r.left}%`,
-              top: `${r.top}%`,
-              width: `${r.size}px`,
-              height: `${r.size}px`,
-              transform: `rotate(${r.rotate}deg)`,
-              opacity: r.opacity,
-              borderWidth: `${r.borderW}px`,
-              pointerEvents: 'none',
-              '--r': `${r.rotate}deg`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
-
-      <div className="hero-bg-text font-bebas-neue uppercase" aria-hidden>
-        Prog-
-        <br />
-        rammer
+      {/* meta row */}
+      <div className="hx-meta" data-intro>
+        <span>Artist / Programmer</span>
+        <span>[ ver. 2026 / portfolio ]</span>
       </div>
 
-      <div className="hero-inner max-w-4xl mx-auto text-center relative z-10 px-6">
-        <div className="hero-title-wrapper inline-block relative">
-          <div className="hero-title-line hero-title-line--top" aria-hidden />
-          <h1 className="hero-title font-splash uppercase relative z-20">Welcome</h1>
-          <div className="hero-title-line hero-title-line--bottom" aria-hidden />
+      {/* red halftone sun + system readout, tucked behind / beside the giant name */}
+      <div className="hx-disc ht" aria-hidden data-intro />
+      <dl className="hx-hud" aria-hidden data-intro>
+        <div>
+          <dt>SYS.STATUS</dt>
+          <dd>
+            <span className="hx-tag">ONLINE</span>
+          </dd>
+        </div>
+        <div>
+          <dt>BUILD</dt>
+          <dd>2026</dd>
+        </div>
+        <div>
+          <dt>SIGNAL</dt>
+          <dd>▮▮▮▮▯</dd>
+        </div>
+      </dl>
+
+      {/* brush greeting on a highlighter swipe, overlapping the name */}
+      <div className="hx-welcome" aria-hidden>
+        <span className="hx-welcome-swipe" />
+        <span className="hx-welcome-text font-splash uppercase">Hi, I&apos;m</span>
+      </div>
+
+      {/* giant name, one span per letter for stagger + hover */}
+      <h1 className="hx-name" aria-label="Hi, I'm Herwin">
+        {NAME.map((ch, i) => (
+          <span key={i} className="hx-letter-mask" aria-hidden>
+            <span className="hx-letter" style={{ '--i': i } as React.CSSProperties}>
+              {ch}
+            </span>
+          </span>
+        ))}
+      </h1>
+
+      {/* print ruler */}
+      <div className="hx-ruler" aria-hidden data-intro>
+        {['000', '025', '050', '075', '100'].map((n) => (
+          <span key={n}>{n}</span>
+        ))}
+      </div>
+
+      {/* intro */}
+      <div className="hx-intro">
+        <p className="hx-lead" data-intro>
+          A Passionate &ldquo;Artist&rdquo; and Programmer even though sometimes I got distracted
+          with other stuff :p
+        </p>
+
+        <div className="hx-note" data-intro>
+          <p>
+            I drink coffee, I eat snacks. I write code and improve my design and skills every day. I
+            am honored to work with special people and I can adapt with new people :{'>'}
+          </p>
+          <div className="hx-file" aria-hidden>
+            <span className="hx-barcode" />
+            <span>FILE: HERWIN_2026.EXE</span>
+          </div>
         </div>
 
-        <div className="hero-description max-w-2xl mx-auto font-architects-daughter text-lg md:text-xl">
-          {lines.map((ln, idx) => (
-            <div key={idx} className="leading-tight">
-              {ln}
-            </div>
+        <div className="hx-scroll" aria-hidden data-intro>
+          <span>Scroll</span>
+          <span className="hx-scroll-arrow">↓</span>
+        </div>
+      </div>
+
+      {/* marquee band */}
+      <div className="hx-marquee" aria-hidden data-intro>
+        <div className="hx-marquee-track">
+          {[0, 1].map((dup) => (
+            <ul key={dup} className="hx-marquee-group">
+              {MARQUEE_ITEMS.map((item) => (
+                <li key={item}>
+                  {item}
+                  <span className="hx-marquee-sep">✦</span>
+                </li>
+              ))}
+              {MARQUEE_ITEMS.map((item) => (
+                <li key={`${item}-b`}>
+                  {item}
+                  <span className="hx-marquee-sep">✦</span>
+                </li>
+              ))}
+            </ul>
           ))}
         </div>
-
-        <div className="hero-arrow">
-          <div className="text-3xl animate-bounce mx-auto w-fit cursor-pointer">↓</div>
-        </div>
       </div>
-
-      <div className="absolute bottom-22 right-6 w-60 text-[0.8rem] leading-relaxed font-mono text-white bg-black p-3 -rotate-2 z-10">
-        <p className="mb-3">
-          I drink coffee, I eat snacks. I write code and improve my design and skills every day. I
-          am honored to work with special people and I can adapt with new people :{'>'}
-        </p>
-        <p className="italic opacity-80">
-          Create this while laying on the bed and snacks of course :3
-        </p>
-      </div>
-
-      <div className="absolute bottom-11 right-6 text-xs font-mono tracking-widest">
-        [ ver. 2025 / portfolio ]
-      </div>
-
-      <RandomRoles />
     </section>
   );
 };
+
 export default HeroSection;

@@ -1,92 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
-
-export function useStackScroll(sectionClass = '.stack-section') {
-  useEffect(() => {
-    const sections = gsap.utils.toArray(sectionClass) as HTMLElement[];
-    if (!sections.length) return;
-
-    sections.forEach((section, i) => {
-      section.style.zIndex = String(i + 1);
-    });
-
-    const createTriggers = () => {
-      // remove previous triggers before creating new ones
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-
-      sections.forEach((section, i) => {
-        // recompute sizes
-        const viewportH = window.innerHeight || document.documentElement.clientHeight;
-        const contentH = Math.max(
-          section.scrollHeight,
-          section.offsetHeight,
-          section.getBoundingClientRect().height,
-        );
-
-        // consider a section "long" when its content is taller than the viewport
-        const isLong = contentH > viewportH;
-
-        // If it's long, do not pin and do NOT change z-index while active
-        if (isLong) {
-          ScrollTrigger.create({
-            trigger: section,
-            start: 'top top',
-            end: () => `+=${contentH}`,
-            pin: false,
-            pinSpacing: false,
-            anticipatePin: 0,
-            scrub: 0,
-            invalidateOnRefresh: true,
-            // <-- removed onEnter/onLeaveBack that previously elevated long sections' z-index
-          });
-        } else {
-          // normal stacked/pinned behaviour for short sections
-          const natural = Math.max(section.offsetHeight, Math.ceil(contentH));
-          ScrollTrigger.create({
-            trigger: section,
-            start: 'top top',
-            end: () => `+=${natural}`,
-            pin: true,
-            pinSpacing: false, // keep stacked overlay look
-            anticipatePin: 1,
-            scrub: 0, // no heavy smoothing to avoid "sticky" feel
-            invalidateOnRefresh: true,
-            onEnter: () => gsap.set(section, { zIndex: sections.length + 1 }), // pinned sections rise on enter
-            onLeaveBack: () => gsap.set(section, { zIndex: i + 1 }),
-          });
-        }
-      });
-    };
-
-    // initial create and refresh after load/resize to catch images/fonts
-    createTriggers();
-    const t1 = window.setTimeout(() => ScrollTrigger.refresh(), 120);
-    const t2 = window.setTimeout(() => {
-      createTriggers();
-      ScrollTrigger.refresh();
-    }, 600);
-
-    const onResize = () => {
-      createTriggers();
-      ScrollTrigger.refresh();
-    };
-    window.addEventListener('resize', onResize);
-    window.addEventListener('load', onResize);
-
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.removeEventListener('resize', onResize);
-      window.removeEventListener('load', onResize);
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
-  }, [sectionClass]);
-}
 
 export function scrollToSection(id: string, sectionClass = '.stack-section') {
   const target = document.getElementById(id);
@@ -104,9 +21,24 @@ export function scrollToSection(id: string, sectionClass = '.stack-section') {
     }
   });
 
+  // leave room for the fixed header so the section's top edge isn't hidden under it
+  const headerH = document.querySelector('header')?.offsetHeight ?? 0;
+
+  // CSS scroll-snap re-snaps every programmatic scroll step, which would fight the tween;
+  // switch it off while we animate and restore it afterwards (the target is a snap position).
+  const pinned = ScrollTrigger.getById(id);
+  const root = document.documentElement;
+  const restoreSnap = () => {
+    root.style.scrollSnapType = '';
+  };
+  root.style.scrollSnapType = 'none';
+
   gsap.to(window, {
-    scrollTo: { y: target, offsetY: 0 },
+    // a pinned section moves while pinned, so aim at its ScrollTrigger start instead of its box
+    scrollTo: pinned ? { y: pinned.start, offsetY: 0 } : { y: target, offsetY: headerH },
     duration: 1,
     ease: 'power2.inOut',
+    onComplete: restoreSnap,
+    onInterrupt: restoreSnap,
   });
 }

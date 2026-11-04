@@ -10,71 +10,100 @@ const NAV_ITEMS = [
   { id: 'home', label: 'Home' },
   { id: 'expertise', label: 'Expertise' },
   { id: 'work', label: 'Work' },
-  { id: 'experience', label: 'Experience' },
   { id: 'contact', label: 'Contact' },
 ];
 
 const Header = () => {
-  const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null);
-  const [revealedCount, setRevealedCount] = React.useState(0);
+  const [active, setActive] = React.useState('home');
+  const listRef = React.useRef<HTMLUListElement>(null);
+  const indicatorRef = React.useRef<HTMLSpanElement>(null);
+  const placed = React.useRef(false);
 
-  React.useEffect(() => {
-    const timers: number[] = [];
-    NAV_ITEMS.forEach((_, i) => {
-      timers.push(
-        window.setTimeout(() => {
-          setRevealedCount((c) => Math.max(c, i + 1));
-        }, i * 100),
-      );
+  // slide the red block to the active link (x + scaleX only, so it stays on the compositor)
+  const moveIndicator = React.useCallback((animate: boolean) => {
+    const list = listRef.current;
+    const indicator = indicatorRef.current;
+    const link = list?.querySelector<HTMLElement>('[aria-current="true"]');
+    if (!list || !indicator || !link) return;
+
+    const linkRect = link.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    gsap.to(indicator, {
+      x: linkRect.left - listRect.left,
+      scaleX: linkRect.width,
+      opacity: 1,
+      duration: animate && !reduce ? 0.55 : 0,
+      ease: 'expo.inOut',
+      overwrite: true,
     });
-    return () => timers.forEach(clearTimeout);
   }, []);
 
+  React.useEffect(() => {
+    moveIndicator(placed.current);
+    placed.current = true;
+  }, [active, moveIndicator]);
+
+  // re-measure when fonts load or the viewport changes (link widths shift)
+  React.useEffect(() => {
+    const remeasure = () => moveIndicator(false);
+    document.fonts.ready.then(remeasure);
+    window.addEventListener('resize', remeasure);
+    return () => window.removeEventListener('resize', remeasure);
+  }, [moveIndicator]);
+
+  // highlight the section currently crossing the middle of the viewport
+  React.useEffect(() => {
+    const sections = NAV_ITEMS.map(({ id }) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => el !== null,
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, []);
+
+  const go = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    scrollToSection(id);
+  };
+
   return (
-    <header className="select-none font-alkatra py-7 md:py-9 fixed top-0 left-0 w-full z-999 bg-transparent">
-      <nav aria-label="Main navigation" className="max-w-7xl mx-auto">
-        <ul className="list-none m-0 p-0 flex justify-center items-center gap-8">
-          {NAV_ITEMS.map(({ id, label }, i) => {
-            const isHovered = hoveredIndex === i;
-            const anyHovered = hoveredIndex !== null;
-            const revealed = i < revealedCount;
+    <header className="nav-x select-none" data-theme="hero">
+      <nav aria-label="Main navigation" className="nav-x-inner">
+        <a
+          href="#home"
+          className="nav-x-mark"
+          onClick={(e) => go(e, 'home')}
+          aria-label="Herwin, back to top"
+        >
+          HERWIN<sup>&copy;26</sup>
+        </a>
 
-            const opacityClass = !revealed
-              ? 'opacity-0'
-              : !anyHovered
-                ? 'opacity-100'
-                : isHovered
-                  ? 'opacity-100'
-                  : 'opacity-60';
-
-            const translateClass = revealed ? 'translate-y-0' : 'translate-y-2';
-            const colorClass = 'text-current';
-            const underlineClass = isHovered ? 'underline decoration-current' : '';
-
-            const itemClasses = [
-              'uppercase',
-              'transition-all',
-              'duration-500',
-              'ease-out',
-              'cursor-pointer',
-              opacityClass,
-              translateClass,
-              colorClass,
-              underlineClass,
-            ].join(' ');
-
-            return (
-              <li
-                key={id}
-                className={itemClasses}
-                onMouseEnter={() => setHoveredIndex(i)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => scrollToSection(id)}
+        <ul className="nav-x-list" ref={listRef}>
+          <span className="nav-x-indicator" ref={indicatorRef} aria-hidden />
+          {NAV_ITEMS.map(({ id, label }, i) => (
+            <li key={id}>
+              <a
+                href={`#${id}`}
+                className="nav-x-link"
+                aria-current={active === id ? 'true' : undefined}
+                onClick={(e) => go(e, id)}
               >
+                <span className="nav-x-index">{String(i + 1).padStart(2, '0')}</span>
                 {label}
-              </li>
-            );
-          })}
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
     </header>

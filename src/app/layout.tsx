@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Alkatra, Splash, Architects_Daughter, Bebas_Neue } from 'next/font/google';
+import { Alkatra, Splash, Architects_Daughter, Bebas_Neue, Space_Mono } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 // import Footer from '@/components/Footer';
@@ -28,9 +28,16 @@ const bebasNeue = Bebas_Neue({
   weight: '400',
 });
 
+const spaceMono = Space_Mono({
+  variable: '--font-space-mono',
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'Herwin Portfolio',
-  description: 'Created with Backend NodeJs + Next.js + Tailwind CSS',
+  description: 'Portfolio of Herwin, an artist and programmer: web, backend, Unity and illustration.',
 };
 
 export default function RootLayout({
@@ -45,6 +52,7 @@ export default function RootLayout({
           ${alkatra.variable} 
           ${architectsDaughter.variable}
           ${bebasNeue.variable}
+          ${spaceMono.variable}
           antialiased`}
       >
         <Header />
